@@ -1,0 +1,27 @@
+---
+- name: Create Kops Directory
+  become: true
+  file:
+    path: /opt/kubernetes/kops-{{ kops_version }}
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Download Kops
+  become: true
+  get_url:
+    url: "{{ kops_download_url }}"
+    dest: /opt/kubernetes/kops-{{ kops_version }}/kops-linux-amd64-{{ kops_version }}
+    mode: 0755
+
+- name: Creating symlink to Kops
+  become: true
+  file:
+    src: /opt/kubernetes/kops-{{ kops_version }}/kops-linux-amd64-{{ kops_version }}
+    dest: /usr/local/bin/kops
+    owner: root
+    group: root
+    mode: 0755
+    state: link
+

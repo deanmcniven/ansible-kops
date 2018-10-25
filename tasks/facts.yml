@@ -1,0 +1,20 @@
+---
+- name: Get kops release info
+  become: false
+  uri:
+    url: https://api.github.com/repos/kubernetes/kops/releases/latest
+    headers:
+      Accept: 'application/vnd.github.v3+json'
+    return_content: yes
+  register: kops_release_info
+  changed_when: false
+
+- name: Get Available Kops Release Info
+  become: false
+  vars:
+    linux_tarball_query: "assets[?name=='kops-linux-amd64'].browser_download_url"
+  set_fact:
+    kops_version: "{{ kops_release_info.json.tag_name }}"
+    kops_download_url: "{{ kops_release_info.json | json_query(linux_tarball_query) | first }}"
+  changed_when: false
+

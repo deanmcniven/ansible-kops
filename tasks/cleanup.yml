@@ -1,0 +1,20 @@
+---
+- name: Old Kops Identifier
+  become: true
+  find:
+    paths: /opt/kubernetes
+    pattern: "kops-\\d+\\.\\d+\\.\\d+$"
+    recurse: no
+    file_type: directory
+    use_regex: yes
+    excludes: "kops-{{ kops_version }}"
+  register: kops_old_installations
+
+- name: Delete Old Kops Installations
+  become: true
+  file:
+    path: "{{ item.path }}"
+    state: absent
+  with_items: "{{ kops_old_installations.files }}"
+  when: kops_old_installations.matched != 0
+
